@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don Bosco Zesde Leerjaar - Hoofdrekenen Master Dynamic</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dbBlue: '#1e3a8a',      /* Deep Navy Blue */
+                        dbOrange: '#f59e0b',    /* Warm Amber */
+                        dbLightBg: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .print-card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-dbLightBg text-slate-800 min-h-screen flex flex-col font-sans selection:bg-dbOrange selection:text-white">
+
+    <header class="bg-dbBlue text-white shadow-md no-print border-b-4 border-dbOrange">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-dbBlue p-3 rounded-2xl shadow-inner font-black text-2xl">
+                    <i class="fa-solid fa-calculator text-dbOrange"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-display font-bold tracking-wide">Don Bosco Zesde Leerjaar</h1>
+                    <p class="text-xs md:text-sm text-blue-100 font-semibold opacity-90">Hoofdrekenen Master (Getallendomein tot 1 000 000)</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Mode Switcher -->
+            <div class="bg-blue-950/60 p-1.5 rounded-xl flex gap-1 border border-blue-400/30">
+                <button id="btn-mode-digital" onclick="switchMode('digital')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbOrange text-white shadow-sm">
+                    <i class="fa-solid fa-laptop-code"></i> Digitaal Oefenen
+                </button>
+                <button id="btn-mode-print" onclick="switchMode('print')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10">
+                    <i class="fa-solid fa-print"></i> Werkblad Generator
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
+
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-6 no-print">
+            
+            <!-- Quick Difficulty Presets -->
+            <div class="mb-5">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                        <i class="fa-solid fa-gauge-high text-dbOrange mr-1"></i> Snelle Niveau-instelling
+                    </label>
+                    <span id="active-level-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-dbBlue">
+                        Niveau 2: Gemiddeld
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button type="button" onclick="setPresetLevel(1)" id="preset-btn-1" class="preset-btn border-2 border-slate-200 hover:border-emerald-500 p-2.5 rounded-xl text-left transition bg-slate-50">
+                        <div class="font-bold text-xs text-emerald-700">Level 1: Opwarmer</div>
+                        <div class="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">Ronde duizendtallen, basistafels</div>
+                    </button>
+                    <button type="button" onclick="setPresetLevel(2)" id="preset-btn-2" class="preset-btn border-2 border-dbOrange p-2.5 rounded-xl text-left transition bg-amber-50/50">
+                        <div class="font-bold text-xs text-amber-700">Level 2: Gemiddeld</div>
+                        <div class="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">Leerjaar 6 standaard, splitsen</div>
+                    </button>
+                    <button type="button" onclick="setPresetLevel(3)" id="preset-btn-3" class="preset-btn border-2 border-slate-200 hover:border-rose-500 p-2.5 rounded-xl text-left transition bg-slate-50">
+                        <div class="font-bold text-xs text-rose-700">Level 3: Uitdaging</div>
+                        <div class="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">Compenseren, handig x / :</div>
+                    </button>
+                    <button type="button" onclick="setPresetLevel(4)" id="preset-btn-4" class="preset-btn border-2 border-slate-200 hover:border-purple-500 p-2.5 rounded-xl text-left transition bg-slate-50">
+                        <div class="font-bold text-xs text-purple-700">Level 4: Expert ⭐</div>
+                        <div class="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">Komma's, breuken & miljoenen</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Operations Pills Selection -->
+            <div class="border-t border-slate-100 pt-4 mb-4">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                    Selecteer Bewerkingen (Combineer vrij)
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm text-slate-700 transition">
+                        <input type="checkbox" id="op-add" checked onchange="onCustomSettingChange()" class="rounded text-dbBlue focus:ring-dbBlue w-4 h-4">
+                        <span>➕ Optellen (+)</span>
+                    </label>
+                    <label class="cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm text-slate-700 transition">
+                        <input type="checkbox" id="op-sub" checked onchange="onCustomSettingChange()" class="rounded text-dbBlue focus:ring-dbBlue w-4 h-4">
+                        <span>➖ Aftrekken (-)</span>
+                    </label>
+                    <label class="cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm text-slate-700 transition">
+                        <input type="checkbox" id="op-mul" checked onchange="onCustomSettingChange()" class="rounded text-dbBlue focus:ring-dbBlue w-4 h-4">
+                        <span>✖️ Vermenigvuldigen (x)</span>
+                    </label>
+                    <label class="cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-sm text-slate-700 transition">
+                        <input type="checkbox" id="op-div" checked onchange="onCustomSettingChange()" class="rounded text-dbBlue focus:ring-dbBlue w-4 h-4">
+                        <span>➗ Delen (:)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Collapsible Custom Difficulty Accordion -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden mb-4">
+                <button type="button" onclick="toggleCustomPanel()" class="w-full bg-slate-50 hover:bg-slate-100 px-4 py-2.5 text-left font-bold text-xs text-slate-700 uppercase tracking-wider flex justify-between items-center transition">
+                    <span><i class="fa-solid fa-sliders text-dbBlue mr-1"></i> Aangepaste Moeilijkheidsgraad & Strategieën Verfijnen</span>
+                    <i id="custom-panel-chevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform"></i>
+                </button>
+                <div id="custom-panel-content" class="hidden p-4 bg-white border-t border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Range Limit -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Maximum Getalgrootte</label>
+                        <select id="cfg-max-range" onchange="onCustomSettingChange()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700">
+                            <option value="100000">Tot 100 000</option>
+                            <option value="500000">Tot 500 000</option>
+                            <option value="1000000" selected>Tot 1 000 000 (Standaard)</option>
+                        </select>
+                    </div>
+
+                    <!-- Number Type Precision -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Getalprecisie</label>
+                        <select id="cfg-precision" onchange="onCustomSettingChange()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700">
+                            <option value="thousands" selected>Alleen ronde duizendtallen (bijv. 420 000)</option>
+                            <option value="hundreds">Honderdtallen insluiten (bijv. 420 500)</option>
+                            <option value="exact">Exacte getallen (bijv. 420 525)</option>
+                        </select>
+                    </div>
+
+                    <!-- Additional Toggles -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Extra Rekenstrategieën</label>
+                        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                            <input type="checkbox" id="cfg-strategy-compensate" onchange="onCustomSettingChange()" class="rounded text-dbBlue w-3.5 h-3.5">
+                            <span>Compenseren (+99 000 / -19 000)</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                            <input type="checkbox" id="cfg-strategy-expert" onchange="onCustomSettingChange()" class="rounded text-dbBlue w-3.5 h-3.5">
+                            <span>Kommagetallen, breuken & miljoenen</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Generator Actions -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Aantal Vragen</label>
+                        <select id="filter-count" onchange="generateNewSet()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700">
+                            <option value="12">12 Oefeningen</option>
+                            <option value="20" selected>20 Oefeningen (A4 Standaard)</option>
+                            <option value="24">24 Oefeningen (Compact)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center h-full pt-4">
+                        <label class="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
+                            <input type="checkbox" id="toggle-hints" onchange="generateNewSet()" class="rounded text-dbBlue w-3.5 h-3.5">
+                            <span>Toon slimme rekentip</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="generateNewSet()" class="bg-dbBlue hover:bg-blue-800 text-white font-bold py-2 px-5 rounded-xl transition shadow flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-arrows-rotate"></i> Nieuwe Oefeningen
+                    </button>
+                    <button id="btn-toggle-answers" onclick="toggleAnswers()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3.5 rounded-xl transition shadow flex items-center gap-1.5 text-sm">
+                        <i class="fa-solid fa-key"></i> <span id="ans-btn-text">Sleutel</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="mode-digital-container" class="space-y-6">
+            <!-- Digital Banner -->
+            <div class="bg-gradient-to-r from-dbBlue to-indigo-950 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="bg-dbOrange text-xs font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider">Interactief Oefenen</span>
+                    <h2 class="text-2xl font-display font-bold mt-1">Hoofdrekenen Zesde Leerjaar</h2>
+                    <p class="text-blue-100 text-sm">Reken snel uit uit het hoofd. Gebruik de slimme strategieën!</p>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 px-5 py-3 rounded-xl backdrop-blur-sm border border-white/20">
+                    <div class="text-center">
+                        <div class="text-xs uppercase text-blue-200 font-bold">Score</div>
+                        <div id="score-display" class="text-3xl font-display font-bold text-dbOrange">0 / 0</div>
+                    </div>
+                    <div class="text-3xl text-white/30">|</div>
+                    <button onclick="checkDigitalAnswers()" class="bg-dbOrange hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl shadow transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Controleer!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedback Alert Box -->
+            <div id="feedback-banner" class="hidden rounded-2xl p-4 transition-all duration-300"></div>
+
+            <!-- Interactive Questions Grid -->
+            <div id="digital-questions-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Dynamic questions injected here -->
+            </div>
+
+            <div class="flex justify-end pt-4">
+                <button onclick="checkDigitalAnswers()" class="bg-dbOrange hover:bg-amber-600 text-white font-extrabold text-lg px-8 py-3 rounded-2xl shadow-lg transition active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Antwoorden Controleren
+                </button>
+            </div>
+        </section>
+
+        <section id="mode-print-container" class="hidden space-y-6">
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-amber-500 text-white rounded-xl">
+                        <i class="fa-solid fa-file-pdf text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Printklaar Werkblad Hoofdrekenen</h3>
+                        <p class="text-xs text-slate-600">Geformatteerd voor A4. Inclusief optionele correctiesleutel.</p>
+                    </div>
+                </div>
+                <button onclick="window.print()" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-print"></i> Afdrukken / PDF Opslaan
+                </button>
+            </div>
+
+            <!-- Printable Sheet -->
+            <div id="printable-worksheet" class="bg-white p-6 md:p-10 rounded-2xl shadow-md border border-slate-200 print-card">
+                
+                <div class="border-b-2 border-slate-800 pb-4 mb-6 flex justify-between items-end">
+                    <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block">Don Bosco Zesde Leerjaar</span>
+                        <h1 class="text-2xl md:text-3xl font-display font-bold text-slate-900">Hoofdrekenen: Vier Bewerkingen</h1>
+                        <p id="print-subtitle" class="text-xs text-slate-600 mt-1 italic">Getallenbereik tot 1 000 000</p>
+                    </div>
+                    <div class="text-right text-xs space-y-2 font-medium">
+                        <div><strong>Naam:</strong> <span class="inline-block w-32 border-b border-slate-400"></span></div>
+                        <div><strong>Klas:</strong> <span class="inline-block w-32 border-b border-slate-400"></span></div>
+                        <div><strong>Datum:</strong> <span class="inline-block w-32 border-b border-slate-400"></span></div>
+                        <div><strong>Score:</strong> <span class="inline-block w-16 border-b border-slate-400"></span> / <span id="print-max-score">20</span></div>
+                    </div>
+                </div>
+
+                <div class="mb-5 text-xs font-semibold text-slate-700 bg-slate-100 p-2.5 rounded-lg border border-slate-200 italic flex justify-between items-center">
+                    <span>📌 <strong>Instructie:</strong> Reken uit uit het hoofd. Let goed op de rekenstrategieën!</span>
+                    <span id="print-level-badge" class="font-bold text-slate-600 uppercase text-[10px] bg-slate-200 px-2 py-0.5 rounded">Niveau: Gemiddeld</span>
+                </div>
+
+                <div id="print-questions-list" class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm md:text-base leading-relaxed">
+                    <!-- Dynamic print items -->
+                </div>
+
+                <div class="mt-10 pt-4 border-t border-slate-300 flex justify-between items-center text-xs text-slate-500">
+                    <span>© Don Bosco Zesde Leerjaar — Wiskunde: Hoofdrekenen</span>
+                    <span>Pagina 1 / 1</span>
+                </div>
+            </div>
+
+            <!-- Printable Answer Key -->
+            <div id="printable-answer-key" class="hidden bg-white p-6 md:p-10 rounded-2xl shadow-md border border-slate-200 print-card page-break mt-8">
+                <div class="border-b-2 border-emerald-600 pb-3 mb-6 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block">Don Bosco Zesde Leerjaar</span>
+                        <h2 class="text-xl font-display font-bold text-slate-900">CORRECTIESLEUTEL (Oplossingen)</h2>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Alleen leerkracht / zelfcorrectie</span>
+                </div>
+
+                <div id="print-answers-list" class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <!-- Printable Answer Key -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 no-print mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+            <p class="font-bold text-slate-300">Don Bosco Zesde Leerjaar — Wiskunde & Hoofdrekenen Master</p>
+            <p>Volledig personaliseerbaar op niveau voor alle leerlingen van het 6e leerjaar.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentMode = 'digital';
+        let generatedQuestions = [];
+        let answersVisible = false;
+        let activeLevel = 2; // Default Preset Level 2
+
+        // Helper to format numbers in Dutch standard (spaces for 1000s, comma for decimals)
+        function formatNum(num) {
+            if (typeof num === 'number' && !Number.isInteger(num)) {
+                return num.toString().replace('.', ',');
+            }
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Accordion toggle
+        function toggleCustomPanel() {
+            const content = document.getElementById('custom-panel-content');
+            const chevron = document.getElementById('custom-panel-chevron');
+            content.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
+        // Set Preset Difficulty Level
+        function setPresetLevel(level) {
+            activeLevel = level;
+            
+            // Highlight Buttons UI
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`preset-btn-${i}`);
+                if (i === level) {
+                    btn.className = "preset-btn border-2 border-dbOrange p-2.5 rounded-xl text-left transition bg-amber-50/50 shadow-sm";
+                } else {
+                    btn.className = "preset-btn border-2 border-slate-200 hover:border-slate-300 p-2.5 rounded-xl text-left transition bg-slate-50";
+                }
+            }
+
+            const badge = document.getElementById('active-level-badge');
+            const rangeSelect = document.getElementById('cfg-max-range');
+            const precSelect = document.getElementById('cfg-precision');
+            const compensateChk = document.getElementById('cfg-strategy-compensate');
+            const expertChk = document.getElementById('cfg-strategy-expert');
+
+            if (level === 1) {
+                badge.textContent = "Niveau 1: Opwarmer";
+                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                rangeSelect.value = "500000";
+                precSelect.value = "thousands";
+                compensateChk.checked = false;
+                expertChk.checked = false;
+            } else if (level === 2) {
+                badge.textContent = "Niveau 2: Gemiddeld";
+                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-dbBlue";
+                rangeSelect.value = "1000000";
+                precSelect.value = "thousands";
+                compensateChk.checked = false;
+                expertChk.checked = false;
+            } else if (level === 3) {
+                badge.textContent = "Niveau 3: Uitdaging";
+                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800";
+                rangeSelect.value = "1000000";
+                precSelect.value = "hundreds";
+                compensateChk.checked = true;
+                expertChk.checked = false;
+            } else if (level === 4) {
+                badge.textContent = "Niveau 4: Expert ⭐";
+                badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800";
+                rangeSelect.value = "1000000";
+                precSelect.value = "exact";
+                compensateChk.checked = true;
+                expertChk.checked = true;
+            }
+
+            generateNewSet();
+        }
+
+        function onCustomSettingChange() {
+            const badge = document.getElementById('active-level-badge');
+            badge.textContent = "Niveau: Aangepast";
+            badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800";
+            generateNewSet();
+        }
+
+        // ADVANCED MATH PROBLEM GENERATOR ENGINE
+        function createExercise(opType) {
+            const maxRange = parseInt(document.getElementById('cfg-max-range').value);
+            const precision = document.getElementById('cfg-precision').value;
+            const useCompensate = document.getElementById('cfg-strategy-compensate').checked;
+            const useExpert = document.getElementById('cfg-strategy-expert').checked;
+
+            let num1, num2, answer, problemStr, hint = "";
+
+            // Special Expert Problems (Level 4: Komma, Breuken & Miljoenen)
+            if (useExpert && Math.random() < 0.35) {
+                const expertTypes = ['fraction', 'decimal_mul', 'million_notation'];
+                const selectedType = expertTypes[getRandomInt(0, expertTypes.length - 1)];
+
+                if (selectedType === 'fraction') {
+                    const fractions = [
+                        { label: '1/2 van', factor: 0.5 },
+                        { label: '1/4 van', factor: 0.25 },
+                        { label: '3/4 van', factor: 0.75 },
+                        { label: '1/5 van', factor: 0.2 },
+                        { label: '2/5 van', factor: 0.4 }
+                    ];
+                    const f = fractions[getRandomInt(0, fractions.length - 1)];
+                    const base = getRandomInt(2, 20) * 50000;
+                    problemStr = `${f.label} ${formatNum(base)}`;
+                    answer = base * f.factor;
+                    hint = "💡 Deel door de noemer en vermenigvuldig met de teller";
+                    return { problem: problemStr, answer: answer, answerFormatted: formatNum(answer), hint: hint };
+                } 
+                else if (selectedType === 'decimal_mul') {
+                    const decimals = [0.1, 0.5, 1.5, 2.5, 0.25];
+                    const dec = decimals[getRandomInt(0, decimals.length - 1)];
+                    const base = getRandomInt(2, 10) * 100000;
+                    problemStr = `${formatNum(dec)} × ${formatNum(base)}`;
+                    answer = dec * base;
+                    hint = "💡 Tip: 0,5 is de helft, 1,5 is eenmaal plus de helft";
+                    return { problem: problemStr, answer: answer, answerFormatted: formatNum(answer), hint: hint };
+                } 
+                else if (selectedType === 'million_notation') {
+                    const val = getRandomInt(1, 8) * 100000 + 100000;
+                    problemStr = `${formatNum(val)} + 0,5 miljoen`;
+                    answer = val + 500000;
+                    hint = "💡 Onthoud: 0,5 miljoen = 500 000";
+                    return { problem: problemStr, answer: answer, answerFormatted: formatNum(answer), hint: hint };
+                }
+            }
+
+            // Standard Generation Logic based on Selected Operation & Precision
+            let step = 10000;
+            if (precision === 'hundreds') step = 100;
+            if (precision === 'exact') step = 1;
+
+            if (opType === 'add') {
+                if (useCompensate && Math.random() < 0.5) {
+                    // Compenseren (+ 99 000 / + 199 000)
+                    let a = getRandomInt(150, 600) * 1000;
+                    let compOffset = [9900, 19000, 99000, 199000][getRandomInt(0, 3)];
+                    num1 = a;
+                    num2 = compOffset;
+                    answer = num1 + num2;
+                    hint = `💡 Tip: Tel eerst ${formatNum(compOffset + (compOffset < 10000 ? 100 : 1000))} bij en trek er daarna 1 of 1000 af`;
+                } else {
+                    let a = getRandomInt(10, Math.floor(maxRange / 20000)) * 10000;
+                    let b = getRandomInt(5, Math.floor(maxRange / 20000)) * 10000;
+                    if (precision !== 'thousands') {
+                        a += getRandomInt(1, 9) * step;
+                        b += getRandomInt(1, 9) * step;
+                    }
+                    num1 = a; num2 = b;
+                    answer = num1 + num2;
+                    hint = "Tel overzichtelijk op per rang (duizendtallen, honderdtallen)";
+                }
+                problemStr = `${formatNum(num1)} + ${formatNum(num2)}`;
+            } 
+            else if (opType === 'sub') {
+                if (useCompensate && Math.random() < 0.5) {
+                    let a = getRandomInt(300, 800) * 1000;
+                    let compOffset = [9900, 19000, 99000, 199000][getRandomInt(0, 3)];
+                    num1 = a;
+                    num2 = compOffset;
+                    answer = num1 - num2;
+                    hint = "💡 Tip: Trek eerst af naar een rond getal en pas aan!";
+                } else {
+                    let a = getRandomInt(20, Math.floor(maxRange / 10000)) * 10000;
+                    let b = getRandomInt(5, Math.floor(a / 10000 - 1)) * 10000;
+                    if (precision !== 'thousands') {
+                        a += getRandomInt(1, 9) * step;
+                        b += getRandomInt(1, 9) * step;
+                    }
+                    num1 = Math.max(a, b);
+                    num2 = Math.min(a, b);
+                    answer = num1 - num2;
+                    hint = "Soms helpt het om aan te vullen naar het dichtstbijzijnde ronde getal";
+                }
+                problemStr = `${formatNum(num1)} - ${formatNum(num2)}`;
+            }
+            else if (opType === 'mul') {
+                const multipliers = [12, 15, 25, 50, 40, 250];
+                num1 = multipliers[getRandomInt(0, multipliers.length - 1)];
+                num2 = getRandomInt(2, 20) * 1000;
+                answer = num1 * num2;
+
+                if (num1 === 25) hint = "💡 Tip: x 25 = eerst : 4 en dan x 100 (of x 100 en : 4)";
+                else if (num1 === 50) hint = "💡 Tip: x 50 = eerst : 2 en dan x 100";
+                else hint = "Splits de vermenigvuldiger of gebruik verdubbelen/halveren";
+
+                problemStr = `${formatNum(num1)} × ${formatNum(num2)}`;
+            }
+            else { // div
+                const divisors = [4, 6, 8, 12, 20, 25, 50, 60, 250];
+                let divisor = divisors[getRandomInt(0, divisors.length - 1)];
+                let quotient = getRandomInt(2, 40) * 1000;
+                num1 = divisor * quotient;
+                num2 = divisor;
+                answer = quotient;
+
+                if (num2 === 25) hint = "💡 Tip: : 25 = eerst : 100 en dan x 4";
+                else if (num2 === 50) hint = "💡 Tip: : 50 = eerst : 100 en dan x 2";
+                else hint = "Schrap evenveel nullen bij het deeltal en de deler!";
+
+                problemStr = `${formatNum(num1)} : ${formatNum(num2)}`;
+            }
+
+            return {
+                problem: problemStr,
+                answer: answer,
+                answerFormatted: formatNum(answer),
+                hint: hint
+            };
+        }
+
+        window.onload = function() {
+            generateNewSet();
+        };
+
+        function switchMode(mode) {
+            currentMode = mode;
+            const digitalBtn = document.getElementById('btn-mode-digital');
+            const printBtn = document.getElementById('btn-mode-print');
+            const digitalContainer = document.getElementById('mode-digital-container');
+            const printContainer = document.getElementById('mode-print-container');
+            const ansBtn = document.getElementById('btn-toggle-answers');
+
+            if (mode === 'digital') {
+                digitalBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbOrange text-white shadow-sm";
+                printBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10";
+                digitalContainer.classList.remove('hidden');
+                printContainer.classList.add('hidden');
+                ansBtn.classList.add('hidden');
+            } else {
+                printBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbOrange text-white shadow-sm";
+                digitalBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10";
+                printContainer.classList.remove('hidden');
+                digitalContainer.classList.add('hidden');
+                ansBtn.classList.remove('hidden');
+            }
+
+            generateNewSet();
+        }
+
+        function getSelectedOperations() {
+            const ops = [];
+            if (document.getElementById('op-add').checked) ops.push('add');
+            if (document.getElementById('op-sub').checked) ops.push('sub');
+            if (document.getElementById('op-mul').checked) ops.push('mul');
+            if (document.getElementById('op-div').checked) ops.push('div');
+
+            // Fallback if none checked
+            if (ops.length === 0) ops.push('add');
+            return ops;
+        }
+
+        function generateNewSet() {
+            const count = parseInt(document.getElementById('filter-count').value);
+            const showHints = document.getElementById('toggle-hints').checked;
+            const allowedOps = getSelectedOperations();
+
+            generatedQuestions = [];
+
+            for (let i = 0; i < count; i++) {
+                let op = allowedOps[i % allowedOps.length];
+                generatedQuestions.push(createExercise(op));
+            }
+
+            if (currentMode === 'digital') {
+                renderDigitalQuestions(showHints);
+            } else {
+                renderPrintQuestions(showHints);
+            }
+
+            document.getElementById('feedback-banner').classList.add('hidden');
+            document.getElementById('score-display').textContent = `0 / ${generatedQuestions.length}`;
+            answersVisible = false;
+            updateAnswerKeyVisibility();
+        }
+
+        function renderDigitalQuestions(showHints) {
+            const container = document.getElementById('digital-questions-list');
+            container.innerHTML = '';
+
+            generatedQuestions.forEach((q, idx) => {
+                const qNum = idx + 1;
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between gap-2 hover:border-slate-300 transition";
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="bg-blue-50 text-dbBlue font-extrabold text-xs px-2.5 py-1 rounded-lg border border-blue-100">#${qNum}</span>
+                        ${showHints ? `<span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">${q.hint}</span>` : ''}
+                    </div>
+                    
+                    <div class="flex items-center justify-between gap-2 my-2">
+                        <span class="text-lg md:text-xl font-display font-bold text-slate-800 tracking-wide">${q.problem} =</span>
+                        <input type="text" id="digital-input-${idx}" autocomplete="off" spellcheck="false" 
+                            class="w-36 border-b-2 border-dbBlue bg-slate-50 focus:bg-amber-50 px-3 py-1.5 font-bold text-dbBlue text-center rounded-t-md outline-none focus:border-dbOrange transition text-lg" 
+                            placeholder="uitkomst...">
+                    </div>
+
+                    <div id="digital-status-${idx}" class="text-xs font-bold hidden items-center justify-end gap-1.5 pt-1"></div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function checkDigitalAnswers() {
+            let correctCount = 0;
+
+            generatedQuestions.forEach((q, idx) => {
+                const input = document.getElementById(`digital-input-${idx}`);
+                const status = document.getElementById(`digital-status-${idx}`);
+                
+                // Format user input comparison (support both decimal dot and comma)
+                const rawUserAns = input.value.replace(/\s+/g, '').replace(',', '.').trim();
+                const expectedAns = q.answer.toString();
+
+                status.classList.remove('hidden', 'flex', 'text-emerald-600', 'text-rose-600');
+
+                if (rawUserAns === expectedAns) {
+                    correctCount++;
+                    input.className = "w-36 border-b-2 border-emerald-500 bg-emerald-50 px-3 py-1.5 font-bold text-emerald-700 text-center rounded-t-md outline-none text-lg";
+                    status.classList.add('flex', 'text-emerald-600');
+                    status.innerHTML = `<i class="fa-solid fa-circle-check"></i> Juist!`;
+                } else {
+                    input.className = "w-36 border-b-2 border-rose-500 bg-rose-50 px-3 py-1.5 font-bold text-rose-700 text-center rounded-t-md outline-none text-lg";
+                    status.classList.add('flex', 'text-rose-600');
+                    status.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Oplossing: <strong>${q.answerFormatted}</strong>`;
+                }
+            });
+
+            document.getElementById('score-display').textContent = `${correctCount} / ${generatedQuestions.length}`;
+
+            const banner = document.getElementById('feedback-banner');
+            banner.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-300', 'bg-amber-50', 'border-amber-300', 'text-emerald-900', 'text-amber-900', 'bg-rose-50', 'border-rose-300', 'text-rose-900');
+            banner.classList.add('border');
+
+            const percentage = (correctCount / generatedQuestions.length) * 100;
+
+            if (percentage === 100) {
+                banner.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-900');
+                banner.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-trophy text-3xl text-amber-500"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Uitstekend! 100% Correct! 🧮🎉</h3>
+                            <p class="text-sm">Je beheerst deze oefeningen tot 1 000 000 fantastisch!</p>
+                        </div>
+                    </div>
+                `;
+            } else if (percentage >= 70) {
+                banner.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-900');
+                banner.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-star text-3xl text-amber-500"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Goed gewerkt! 👍</h3>
+                            <p class="text-sm">Je behaalde ${correctCount} op ${generatedQuestions.length}. Kijk de foutjes even na!</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                banner.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-900');
+                banner.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-lightbulb text-3xl text-amber-500"></i>
+                        <div>
+                            <h3 class="font-bold text-lg">Blijven oefenen! 💪</h3>
+                            <p class="text-sm">Je score is ${correctCount} / ${generatedQuestions.length}. Schakel eventueel de rekentips in voor hulp bij de strategieën.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function renderPrintQuestions(showHints) {
+            const container = document.getElementById('print-questions-list');
+            const answersContainer = document.getElementById('print-answers-list');
+            const badgeText = document.getElementById('active-level-badge').textContent.trim();
+
+            document.getElementById('print-max-score').textContent = generatedQuestions.length;
+            document.getElementById('print-level-badge').textContent = badgeText;
+
+            container.innerHTML = '';
+            answersContainer.innerHTML = '';
+
+            generatedQuestions.forEach((q, idx) => {
+                const qNum = idx + 1;
+
+                const pItem = document.createElement('div');
+                pItem.className = "flex items-baseline justify-between py-1 border-b border-slate-100 pr-2";
+                pItem.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-500 w-6 text-right select-none">${qNum}.</span>
+                        <span class="font-bold text-slate-800">${q.problem} =</span>
+                    </div>
+                    <span class="inline-block border-b-2 border-slate-800 w-32 text-center font-bold text-slate-800 print:border-black"></span>
+                `;
+                container.appendChild(pItem);
+
+                const aItem = document.createElement('div');
+                aItem.className = "flex items-center justify-between py-1 border-b border-slate-200 pr-2";
+                aItem.innerHTML = `
+                    <span class="font-bold text-slate-400 w-6">${qNum}.</span>
+                    <span class="text-slate-700 font-medium">${q.problem} =</span>
+                    <span class="font-extrabold text-emerald-800">${q.answerFormatted}</span>
+                `;
+                answersContainer.appendChild(aItem);
+            });
+        }
+
+        function toggleAnswers() {
+            answersVisible = !answersVisible;
+            updateAnswerKeyVisibility();
+        }
+
+        function updateAnswerKeyVisibility() {
+            const answerKeyDiv = document.getElementById('printable-answer-key');
+            const btnText = document.getElementById('ans-btn-text');
+
+            if (answersVisible) {
+                answerKeyDiv.classList.remove('hidden');
+                btnText.textContent = "Sleutel Verbergen";
+            } else {
+                answerKeyDiv.classList.add('hidden');
+                btnText.textContent = "Sleutel";
+            }
+        }
+    </script>
+</body>
+</html>
